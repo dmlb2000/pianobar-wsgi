@@ -1,0 +1,4 @@
+[Service]
+Type=forking
+PIDFile=/var/run/pianobar.pid
+ExecStart=/usr/sbin/pianobar

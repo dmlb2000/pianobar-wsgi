@@ -1,0 +1,26 @@
+#!/bin/bash -e
+
+PIDFILE=/var/run/pianobar.pid
+PIANOBAR_EXE=/root/pianobar/pianobar
+
+if [[ -f $PIDFILE && -d /proc/$(cat $PIDFILE) && $(readlink /proc/$(cat $PIDFILE)/exe) == $PIANOBAR_EXE ]] ; then
+  echo Pianobar is already running
+  exit -1
+fi
+
+B=/var/lib/pianobar
+PIANOBAR_BASE=$B
+PIANOBAR_STDOUT=$B/pianobar.log
+PIANOBAR_STDIN=$B/stdin.fifo
+(
+rm -f $PIANOBAR_STDIN
+mkfifo -m 0600 $PIANOBAR_STDIN
+exec 1>>$PIANOBAR_STDOUT
+exec 4<>$PIANOBAR_STDIN
+exec 2>&1
+stdbuf -i0 -oL -eL $PIANOBAR_EXE <$PIANOBAR_STDIN &
+echo $! > $PIDFILE
+exec 0</dev/null
+wait
+rm -f $PIDFILE
+) < /dev/null > /dev/null 2>&1 &
