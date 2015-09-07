@@ -22,5 +22,5 @@ stdbuf -i0 -oL -eL $PIANOBAR_EXE <$PIANOBAR_STDIN &
 echo $! > $PIDFILE
 exec 0</dev/null
 wait
-rm -f $PIDFILE
+rm -f $PIDFILE $PIANOBAR_STDIN
 ) < /dev/null > /dev/null 2>&1 &
